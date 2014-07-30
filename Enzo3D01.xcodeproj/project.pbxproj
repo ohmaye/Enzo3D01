@@ -26,6 +26,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		F721B58019891E3500B11B56 /* Playground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Playground.playground; sourceTree = "<group>"; };
 		F7EEC58C1987D79C0038AF17 /* Enzo3D01.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Enzo3D01.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F7EEC5901987D79C0038AF17 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F7EEC5911987D79C0038AF17 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -83,6 +84,7 @@
 				F7EEC5971987D79C0038AF17 /* Main.storyboard */,
 				F7EEC59A1987D79C0038AF17 /* Images.xcassets */,
 				F7EEC58F1987D79C0038AF17 /* Supporting Files */,
+				F721B58019891E3500B11B56 /* Playground.playground */,
 			);
 			path = Enzo3D01;
 			sourceTree = "<group>";
@@ -331,6 +333,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = Enzo3D01/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -342,6 +345,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = Enzo3D01/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -401,6 +405,7 @@
 				F7EEC5AC1987D79C0038AF17 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		F7EEC5AD1987D79C0038AF17 /* Build configuration list for PBXNativeTarget "Enzo3D01Tests" */ = {
 			isa = XCConfigurationList;
@@ -409,6 +414,7 @@
 				F7EEC5AF1987D79C0038AF17 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

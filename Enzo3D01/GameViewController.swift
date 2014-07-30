@@ -16,7 +16,17 @@ class GameViewController: UIViewController {
         super.viewDidLoad()
         
         // create a new scene
-        let scene = SCNScene(named: "art.scnassets/ship.dae")
+        let scene = SCNScene(named: "art.scnassets/ball.dae")
+        
+        var node = SCNNode()
+        node.position = SCNVector3(x: 2, y: 2, z: 2)
+        var sphere = SCNSphere(radius: 1)
+        node.geometry = sphere
+        var material = SCNMaterial()
+        sphere.firstMaterial.diffuse.contents = UIColor.blueColor()
+        node.opacity = 1
+        
+        scene.rootNode.addChildNode(node)
         
         // create and add a camera to the scene
         let cameraNode = SCNNode()
@@ -44,7 +54,7 @@ class GameViewController: UIViewController {
         let ship = scene.rootNode.childNodeWithName("ship", recursively: true)
         
         // animate the 3d object
-        ship.runAction(SCNAction.repeatActionForever(SCNAction.rotateByX(0, y: 2, z: 0, duration: 1)))
+       // ship.runAction(SCNAction.repeatActionForever(SCNAction.rotateByX(0, y: 2, z: 0, duration: 1)))
         
         // retrieve the SCNView
         let scnView = self.view as SCNView
@@ -62,12 +72,12 @@ class GameViewController: UIViewController {
         scnView.backgroundColor = UIColor.blackColor()
         
         // add a tap gesture recognizer
-        let tapGesture = UITapGestureRecognizer(target: self, action: "handleTap:")
+ /*       let tapGesture = UITapGestureRecognizer(target: self, action: "handleTap:")
         let gestureRecognizers = NSMutableArray()
         gestureRecognizers.addObject(tapGesture)
         gestureRecognizers.addObjectsFromArray(scnView.gestureRecognizers)
         scnView.gestureRecognizers = gestureRecognizers
-    }
+ */   }
     
     func handleTap(gestureRecognize: UIGestureRecognizer) {
         // retrieve the SCNView
