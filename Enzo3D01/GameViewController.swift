@@ -15,69 +15,33 @@ class GameViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // create a scene view with an empty scene
-        //var sceneView = SCNView(frame: CGRect(x: 0, y: 0, width: 500, height: 500))
-        var scene = SCNScene()
-        //sceneView.scene = scene
+        // retrieve the SCNView
+        let scnView = self.view as SCNView
         
-
+        // create a scene view with an empty scene
+        var scene = SCNScene()
+        scnView.scene = scene
         
         // a camera
         var camera = SCNCamera()
         var cameraNode = SCNNode()
+        var pointToNode = SCNNode()
+        pointToNode.position = SCNVector3Zero
+        cameraNode.constraints = [SCNLookAtConstraint(target: pointToNode)]
         cameraNode.camera = camera
-        cameraNode.position = SCNVector3(x: 0, y: 0, z: 15)
+        cameraNode.position = SCNVector3(x: 0, y: 60, z: 0)
         scene.rootNode.addChildNode(cameraNode)
-        
-        // a geometry object
-        var torus = SCNTorus(ringRadius: 1, pipeRadius: 0.35)
-        var torusNode = SCNNode(geometry: torus)
-        scene.rootNode.addChildNode(torusNode)
-        
-        // configure the geometry object
-        torus.firstMaterial.diffuse.contents  = UIColor.redColor()
-        torus.firstMaterial.specular.contents = UIColor.whiteColor()
-        torusNode.opacity = 0.5
-        
-        var ball = SCNNode()
-        var sphere = SCNSphere(radius: 0.5)
-        ball.geometry = sphere;
-        ball.geometry.firstMaterial.diffuse.wrapS = SCNWrapMode.Repeat
-        ball.geometry.firstMaterial.diffuse.contents = "art.scnassets/ball.jpg"
-        ball.geometry.firstMaterial.reflective.contents = "art.scnassets/envmap.jpg"
-        ball.geometry.firstMaterial.fresnelExponent = 1.0;
-        ball.physicsBody = SCNPhysicsBody.dynamicBody()
-        ball.physicsBody.restitution = 0.9;
-        var action = SCNAction.rotateByX(0, y: 2, z: 0, duration: 3)
-        ball.runAction(SCNAction.repeatActionForever(action))
-        scene.rootNode.addChildNode(ball)
-        createBalls(scene)
-        
-        // create and add a light to the scene
-        let lightNode = SCNNode()
-        lightNode.light = SCNLight()
-        lightNode.light.type = SCNLightTypeOmni
-        lightNode.position = SCNVector3(x: 0, y: 10, z: 10)
-        scene.rootNode.addChildNode(lightNode)
-        
-        // create and add an ambient light to the scene
-        let ambientLightNode = SCNNode()
-        ambientLightNode.light = SCNLight()
-        ambientLightNode.light.type = SCNLightTypeAmbient
-        ambientLightNode.light.color = UIColor.darkGrayColor()
-        scene.rootNode.addChildNode(ambientLightNode)
-        
-        // retrieve the SCNView
-        let scnView = self.view as SCNView
-        scnView.allowsCameraControl = true
-        // default lighting
-        scnView.autoenablesDefaultLighting = true
-        
-        // set the scene to the view
-        scnView.scene = scene
         
         // allows the user to manipulate the camera
         scnView.allowsCameraControl = true
+
+        createFloor(scene)
+        createTorus(scene)
+        createBalls(scene)
+        createLight(scene)
+
+        // default lighting
+        scnView.autoenablesDefaultLighting = true
         
         // show statistics such as fps and timing information
         scnView.showsStatistics = true
@@ -93,9 +57,10 @@ class GameViewController: UIViewController {
         scnView.gestureRecognizers = gestureRecognizers
     }
     
+    
     func createBalls( scene: SCNScene ) {
         // Create geometry that will be shared by all balls
-        var sphere = SCNSphere(radius: 0.5)
+        var sphere = SCNSphere(radius: 1.0)
 //        ball.geometry = sphere;
         sphere.firstMaterial.diffuse.wrapS = SCNWrapMode.Repeat
         sphere.firstMaterial.diffuse.contents = "art.scnassets/ball.jpg"
@@ -107,14 +72,62 @@ class GameViewController: UIViewController {
         var action = SCNAction.repeatActionForever(SCNAction.rotateByX(0, y: 2, z: 0, duration: 0.1))
 //        ball.runAction(SCNAction.repeatActionForever(action))
         
-        for i in -10...10 {
+        for i in stride(from: -10.0, through: 10.0, by: 1.5) {
             var node = SCNNode()
-            node.position = SCNVector3Make(Float(i), Float(i), 0)
+            node.position = SCNVector3Make(Float(i), 1, Float(i))
             node.geometry = sphere
             //node.runAction(action)
-            node.physicsBody = SCNPhysicsBody.dynamicBody()
+            //node.physicsBody = SCNPhysicsBody.dynamicBody()
             scene.rootNode.addChildNode(node)
         }
+    }
+    
+    func createTorus( scene: SCNScene ) {
+        // a geometry object
+        var torus = SCNTorus(ringRadius: 1, pipeRadius: 0.35)
+        var torusNode = SCNNode(geometry: torus)
+        scene.rootNode.addChildNode(torusNode)
+        
+        // configure the geometry object
+        torus.firstMaterial.diffuse.contents  = UIColor.redColor()
+        torus.firstMaterial.specular.contents = UIColor.whiteColor()
+        torusNode.opacity = 0.5
+    }
+    
+    func createLight( scene: SCNScene ) {
+        // create and add a light to the scene
+        let lightNode = SCNNode()
+        lightNode.light = SCNLight()
+        lightNode.light.type = SCNLightTypeOmni
+        lightNode.position = SCNVector3(x: 0, y: 10, z: 10)
+        scene.rootNode.addChildNode(lightNode)
+        
+        // create and add an ambient light to the scene
+        let ambientLightNode = SCNNode()
+        ambientLightNode.light = SCNLight()
+        ambientLightNode.light.type = SCNLightTypeAmbient
+        ambientLightNode.light.color = UIColor.darkGrayColor()
+        scene.rootNode.addChildNode(ambientLightNode)
+    }
+    
+    func createFloor( scene: SCNScene ) {
+        //floor
+        var floor = SCNFloor()
+        floor.reflectionFalloffEnd = 0
+        floor.reflectivity = 0
+        
+        var floorNode = SCNNode()
+        floorNode.geometry = floor
+        floorNode.geometry.firstMaterial.diffuse.contents = "art.scnassets/wood.png"
+        floorNode.geometry.firstMaterial.locksAmbientWithDiffuse = true
+        floorNode.geometry.firstMaterial.diffuse.wrapS = SCNWrapMode.Repeat
+        floorNode.geometry.firstMaterial.diffuse.wrapT = SCNWrapMode.Repeat
+        floorNode.geometry.firstMaterial.diffuse.mipFilter = SCNFilterMode.Linear
+        
+        floorNode.physicsBody = SCNPhysicsBody.staticBody()
+        floorNode.physicsBody.restitution = 1.0;
+        
+        scene.rootNode.addChildNode(floorNode)
     }
     
     func handleTap(gestureRecognize: UIGestureRecognizer) {
