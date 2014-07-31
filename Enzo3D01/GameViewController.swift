@@ -15,26 +15,43 @@ class GameViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // create a new scene
-        let scene = SCNScene(named: "art.scnassets/ball.dae")
+        // create a scene view with an empty scene
+        //var sceneView = SCNView(frame: CGRect(x: 0, y: 0, width: 500, height: 500))
+        var scene = SCNScene()
+        //sceneView.scene = scene
         
-        var node = SCNNode()
-        node.position = SCNVector3(x: 2, y: 2, z: 2)
-        var sphere = SCNSphere(radius: 1)
-        node.geometry = sphere
-        var material = SCNMaterial()
-        sphere.firstMaterial.diffuse.contents = UIColor.blueColor()
-        node.opacity = 1
+
         
-        scene.rootNode.addChildNode(node)
-        
-        // create and add a camera to the scene
-        let cameraNode = SCNNode()
-        cameraNode.camera = SCNCamera()
+        // a camera
+        var camera = SCNCamera()
+        var cameraNode = SCNNode()
+        cameraNode.camera = camera
+        cameraNode.position = SCNVector3(x: 0, y: 0, z: 15)
         scene.rootNode.addChildNode(cameraNode)
         
-        // place the camera
-        cameraNode.position = SCNVector3(x: 0, y: 0, z: 15)
+        // a geometry object
+        var torus = SCNTorus(ringRadius: 1, pipeRadius: 0.35)
+        var torusNode = SCNNode(geometry: torus)
+        scene.rootNode.addChildNode(torusNode)
+        
+        // configure the geometry object
+        torus.firstMaterial.diffuse.contents  = UIColor.redColor()
+        torus.firstMaterial.specular.contents = UIColor.whiteColor()
+        torusNode.opacity = 0.5
+        
+        var ball = SCNNode()
+        var sphere = SCNSphere(radius: 0.5)
+        ball.geometry = sphere;
+        ball.geometry.firstMaterial.diffuse.wrapS = SCNWrapMode.Repeat
+        ball.geometry.firstMaterial.diffuse.contents = "art.scnassets/ball.jpg"
+        ball.geometry.firstMaterial.reflective.contents = "art.scnassets/envmap.jpg"
+        ball.geometry.firstMaterial.fresnelExponent = 1.0;
+        ball.physicsBody = SCNPhysicsBody.dynamicBody()
+        ball.physicsBody.restitution = 0.9;
+        var action = SCNAction.rotateByX(0, y: 2, z: 0, duration: 3)
+        ball.runAction(SCNAction.repeatActionForever(action))
+        scene.rootNode.addChildNode(ball)
+        createBalls(scene)
         
         // create and add a light to the scene
         let lightNode = SCNNode()
@@ -50,14 +67,11 @@ class GameViewController: UIViewController {
         ambientLightNode.light.color = UIColor.darkGrayColor()
         scene.rootNode.addChildNode(ambientLightNode)
         
-        // retrieve the ship node
-        let ship = scene.rootNode.childNodeWithName("ship", recursively: true)
-        
-        // animate the 3d object
-       // ship.runAction(SCNAction.repeatActionForever(SCNAction.rotateByX(0, y: 2, z: 0, duration: 1)))
-        
         // retrieve the SCNView
         let scnView = self.view as SCNView
+        scnView.allowsCameraControl = true
+        // default lighting
+        scnView.autoenablesDefaultLighting = true
         
         // set the scene to the view
         scnView.scene = scene
@@ -72,12 +86,36 @@ class GameViewController: UIViewController {
         scnView.backgroundColor = UIColor.blackColor()
         
         // add a tap gesture recognizer
- /*       let tapGesture = UITapGestureRecognizer(target: self, action: "handleTap:")
+        let tapGesture = UITapGestureRecognizer(target: self, action: "handleTap:")
         let gestureRecognizers = NSMutableArray()
         gestureRecognizers.addObject(tapGesture)
         gestureRecognizers.addObjectsFromArray(scnView.gestureRecognizers)
         scnView.gestureRecognizers = gestureRecognizers
- */   }
+    }
+    
+    func createBalls( scene: SCNScene ) {
+        // Create geometry that will be shared by all balls
+        var sphere = SCNSphere(radius: 0.5)
+//        ball.geometry = sphere;
+        sphere.firstMaterial.diffuse.wrapS = SCNWrapMode.Repeat
+        sphere.firstMaterial.diffuse.contents = "art.scnassets/ball.jpg"
+        sphere.firstMaterial.reflective.contents = "art.scnassets/envmap.jpg"
+        sphere.firstMaterial.fresnelExponent = 1.0;
+        let physicsBody = SCNPhysicsBody.dynamicBody()
+        physicsBody.restitution = 0.9;
+        
+        var action = SCNAction.repeatActionForever(SCNAction.rotateByX(0, y: 2, z: 0, duration: 0.1))
+//        ball.runAction(SCNAction.repeatActionForever(action))
+        
+        for i in -10...10 {
+            var node = SCNNode()
+            node.position = SCNVector3Make(Float(i), Float(i), 0)
+            node.geometry = sphere
+            //node.runAction(action)
+            node.physicsBody = SCNPhysicsBody.dynamicBody()
+            scene.rootNode.addChildNode(node)
+        }
+    }
     
     func handleTap(gestureRecognize: UIGestureRecognizer) {
         // retrieve the SCNView
@@ -109,7 +147,7 @@ class GameViewController: UIViewController {
                 SCNTransaction.commit()
             }
             
-            material.emission.contents = UIColor.redColor()
+            material.emission.contents = UIColor.yellowColor()
             
             SCNTransaction.commit()
         }
