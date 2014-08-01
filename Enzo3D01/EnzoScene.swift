@@ -15,6 +15,7 @@ class EnzoScene: SCNScene, SCNSceneRendererDelegate {
     func renderer( aRenderer: SCNSceneRenderer!, updateAtTime time: NSTimeInterval) {
         let appDelegate = UIApplication.sharedApplication().delegate as AppDelegate
         let motionMgr = appDelegate.motionManager
-        print(motionMgr.gyroData)
+        let deviceMotion = motionMgr.deviceMotion
+        print(deviceMotion?.gravity)
     }
 }

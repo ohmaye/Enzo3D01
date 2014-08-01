@@ -25,10 +25,16 @@ class GameViewController: UIViewController {
         scene.physicsWorld.speed = 4.0
         scnView.scene = scene
         scnView.delegate = scene
+        scene.physicsWorld.gravity = SCNVector3(x: 0, y: 0, z: 0)
         
         // Overlay SK panel
         var skScene = SKScene(size: CGSize(width: 100, height: 100))
         var skNode = SKSpriteNode(color: UIColor.blueColor(), size: CGSize(width: 200, height: 20))
+        var skLabelNode = SKLabelNode(text: "Hey what's up?")
+        skLabelNode.fontSize = 8
+        skLabelNode.fontColor = SKColor.whiteColor()
+        skLabelNode.position = CGPoint(x: 50, y: 5)
+        skNode.addChild(skLabelNode)
         skScene.addChild(skNode)
         scnView.overlaySKScene = skScene
         
@@ -46,10 +52,10 @@ class GameViewController: UIViewController {
         scnView.allowsCameraControl = true
 
         createPlane(scene, width: 40, height: 40, z: 0, isVisible: true )
-        createBox(scene, x: -20, y: 0, z: 3, width: 1, height: 40, length: 6)   // Left wall
-        createBox(scene, x: 20, y: 0, z: 3, width: 1, height: 40, length: 6)    // Right wall
-        createBox(scene, x: 0, y: 20, z: 3, width: 42, height: 1, length: 6)    // Top wall
-        createBox(scene, x: 0, y: -20, z: 3, width: 42, height: 1, length: 6)    // Bottom wall
+        createBox(scene, x: -20, y: 0, z: 3, width: 1, height: 40, length: 26)   // Left wall
+        createBox(scene, x: 20, y: 0, z: 3, width: 1, height: 40, length: 26)    // Right wall
+        createBox(scene, x: 0, y: 20, z: 3, width: 42, height: 1, length: 26)    // Top wall
+        createBox(scene, x: 0, y: -20, z: 3, width: 42, height: 1, length: 26)    // Bottom wall
         createPlane(scene, width: 40, height: 40, z: 6, isVisible: false)
         createTorus(scene, x: 0, y: 0, z: 0)
         createBalls(scene)
@@ -117,6 +123,12 @@ class GameViewController: UIViewController {
         torus.firstMaterial.diffuse.contents  = UIColor.redColor()
         torus.firstMaterial.specular.contents = UIColor.whiteColor()
         torusNode.opacity = 0.5
+        
+        // Add physicsfield
+        var field = SCNPhysicsField.turbulenceFieldWithSmoothness(0.0, animationSpeed: 0.5)
+        //field = SCNPhysicsField.vortexField()
+        field.strength = 5.0
+        torusNode.physicsField = field
     }
     
     func createLight( scene: SCNScene ) {
