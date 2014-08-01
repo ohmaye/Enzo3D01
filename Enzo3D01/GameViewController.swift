@@ -128,7 +128,7 @@ class GameViewController: UIViewController {
         var field = SCNPhysicsField.turbulenceFieldWithSmoothness(0.0, animationSpeed: 0.5)
         //field = SCNPhysicsField.vortexField()
         field.strength = 5.0
-        torusNode.physicsField = field
+        //torusNode.physicsField = field
     }
     
     func createLight( scene: SCNScene ) {
@@ -242,7 +242,7 @@ class GameViewController: UIViewController {
     }
     
     override func shouldAutorotate() -> Bool {
-        return true
+        return false
     }
     
     override func supportedInterfaceOrientations() -> Int {
