@@ -9,6 +9,8 @@
 import UIKit
 import QuartzCore
 import SceneKit
+import SpriteKit
+
 
 class GameViewController: UIViewController {
 
@@ -19,9 +21,16 @@ class GameViewController: UIViewController {
         let scnView = self.view as SCNView
         
         // create a scene view with an empty scene
-        var scene = SCNScene()
+        var scene = EnzoScene()
         scene.physicsWorld.speed = 4.0
         scnView.scene = scene
+        scnView.delegate = scene
+        
+        // Overlay SK panel
+        var skScene = SKScene(size: CGSize(width: 100, height: 100))
+        var skNode = SKSpriteNode(color: UIColor.blueColor(), size: CGSize(width: 200, height: 20))
+        skScene.addChild(skNode)
+        scnView.overlaySKScene = skScene
         
         // a camera
         var camera = SCNCamera()
@@ -66,7 +75,7 @@ class GameViewController: UIViewController {
     
     func createBalls( scene: SCNScene ) {
         // Create geometry that will be shared by all balls
-        var sphere = SCNSphere(radius: 1.0)
+        var sphere = SCNSphere(radius: 1.2)
         sphere.firstMaterial.diffuse.wrapS = SCNWrapMode.Repeat
         sphere.firstMaterial.diffuse.contents = "art.scnassets/ball.jpg"
         sphere.firstMaterial.reflective.contents = "art.scnassets/envmap.jpg"
@@ -83,8 +92,9 @@ class GameViewController: UIViewController {
             node.physicsBody = SCNPhysicsBody.dynamicBody()
             scene.rootNode.addChildNode(node)
         }
-        var sphere2 = SCNSphere(radius: 1.0)
+        var sphere2 = SCNSphere(radius: 1.2)
         sphere2.firstMaterial.diffuse.contents = UIColor.blueColor()
+        sphere2.firstMaterial.reflective.contents = "art.scnassets/envmap.jpg"
         
         for i in stride(from: -10.0, through: 10.0, by: 1.5) {
             var node = SCNNode()
