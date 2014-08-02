@@ -14,7 +14,7 @@ import SpriteKit
 
 class GameViewController: UIViewController {
     
-    var scnView : SCNView!
+    var _scnView : SCNView!
     var _scnScene : EnzoScene!
     let Z_POINT_OF_VIEW : Float = 46
 
@@ -22,53 +22,51 @@ class GameViewController: UIViewController {
         super.viewDidLoad()
         
         // retrieve the SCNView
-        scnView = self.view as SCNView
+        _scnView = self.view as SCNView
         _scnScene = EnzoScene()
         
         // create a scene view with an empty scene
         _scnScene.physicsWorld.speed = 1.0
-        scnView.scene = _scnScene
-        scnView.delegate = _scnScene
+        _scnView.scene = _scnScene
+        _scnView.delegate = _scnScene
         _scnScene.physicsWorld.gravity = SCNVector3(x: 0, y: 0, z: 0)
 
         // a camera
         var camera = SCNCamera()
         var cameraNode = SCNNode()
-        var pointToNode = SCNNode()
         camera.zFar = Double(Z_POINT_OF_VIEW)
-        pointToNode.position = SCNVector3Zero
-        //cameraNode.constraints = [SCNLookAtConstraint(target: pointToNode)]
         cameraNode.camera = camera
         cameraNode.position = SCNVector3(x: 0, y: 0, z: 46)
-        scnView.pointOfView = cameraNode
+        _scnView.pointOfView = cameraNode
         _scnScene.rootNode.addChildNode(cameraNode)
         
         // allows the user to manipulate the camera
-        scnView.allowsCameraControl = false
+        _scnView.allowsCameraControl = false
+        _scnView.playing = true
 
-        createPlane(60, height: 40, z: 0, isVisible: true )
-        createBox(-30, y: 0, z: 3, width: 1, height: 42, length: 6)   // Left wall
-        createBox(30, y: 0, z: 3, width: 1, height: 42, length: 6)    // Right wall
-        createBox(0, y: 20, z: 3, width: 62, height: 1, length: 6)    // Top wall
-        createBox(0, y: -20, z: 3, width: 62, height: 1, length: 6)    // Bottom wall
-        createPlane(60, height: 40, z: 6, isVisible: false)
+        createPlane(60, height: 40, z: 0, isVisible: true )             // Floor
+        createBox(-30, y: 0, z: 3, width: 1, height: 42, length: 6)     // Left wall
+        createBox(30, y: 0, z: 3, width: 1, height: 42, length: 6)      // Right wall
+        createBox(0, y: 20, z: 3, width: 62, height: 1, length: 6)      // Top wall
+        createBox(0, y: -20, z: 3, width: 62, height: 1, length: 6)     // Bottom wall
+        createPlane(60, height: 40, z: 6, isVisible: false)             // Ceiling transparent
         createTorus(0, y: 0, z: 0)
         createBalls()
         createLight()
 
         // default lighting
-        scnView.autoenablesDefaultLighting = true
+        _scnView.autoenablesDefaultLighting = true
         
         // show statistics such as fps and timing information
-        scnView.showsStatistics = true
+        _scnView.showsStatistics = true
         
         // configure the view
-        scnView.backgroundColor = UIColor.blackColor()
+        _scnView.backgroundColor = UIColor.blackColor()
     }
     
     func createBalls() {
         // Create geometry that will be shared by all balls
-        var sphere = SCNSphere(radius: 1.2)
+        var sphere = SCNSphere(radius: 1.5)
         sphere.firstMaterial.diffuse.wrapS = SCNWrapMode.Repeat
         sphere.firstMaterial.diffuse.contents = "art.scnassets/ball.jpg"
         sphere.firstMaterial.reflective.contents = "art.scnassets/envmap.jpg"
@@ -83,7 +81,7 @@ class GameViewController: UIViewController {
             node.physicsBody = SCNPhysicsBody.dynamicBody()
             _scnScene.rootNode.addChildNode(node)
         }
-        var sphere2 = SCNSphere(radius: 1.2)
+        var sphere2 = SCNSphere(radius: 1.5)
         sphere2.firstMaterial.diffuse.contents = UIColor.blueColor()
         sphere2.firstMaterial.reflective.contents = "art.scnassets/envmap.jpg"
         
@@ -99,7 +97,7 @@ class GameViewController: UIViewController {
     
     func createTorus( x: Float, y: Float, z: Float ) {
         // a geometry object
-        var torus = SCNTorus(ringRadius: 1, pipeRadius: 0.35)
+        var torus = SCNTorus(ringRadius: 2, pipeRadius: 0.35)
         var torusNode = SCNNode(geometry: torus)
         torusNode.position = SCNVector3(x: x, y: y, z: z)
         torusNode.rotation = SCNVector4Make(90, 90, 90, 90)
@@ -112,9 +110,13 @@ class GameViewController: UIViewController {
         
         // Add physicsfield
         var field = SCNPhysicsField.turbulenceFieldWithSmoothness(0.0, animationSpeed: 0.5)
-        field = SCNPhysicsField.vortexField()
+        field = SCNPhysicsField.springField()
         field.strength = 1.0
         torusNode.physicsField = field
+        let action1 = SCNAction.waitForDuration(2)
+        let action2 = SCNAction.removeFromParentNode()
+        let actions = SCNAction.sequence([action1, action2])
+        torusNode.runAction(actions)
     }
     
     func createLight() {
@@ -145,6 +147,7 @@ class GameViewController: UIViewController {
             planeNode.geometry.firstMaterial.diffuse.wrapS = SCNWrapMode.Repeat
             planeNode.geometry.firstMaterial.diffuse.wrapT = SCNWrapMode.Repeat
             planeNode.geometry.firstMaterial.diffuse.mipFilter = SCNFilterMode.Linear
+            planeNode.opacity = 1.0
         } else {
             planeNode.opacity = 0.0
         }
@@ -177,7 +180,7 @@ class GameViewController: UIViewController {
         for touch: AnyObject in touches! {
             let location = touch.locationInView(self.view)
             let pointInView = SCNVector3(x: Float(location.x), y: Float(location.y), z: 0)
-            let pointInScene = scnView.unprojectPoint(pointInView)
+            let pointInScene = _scnView.unprojectPoint(pointInView)
 
             println("X Y Z (View) : \(location.x) \(location.y) \(location.y)")
             println("X Y Z (Scene): \(pointInScene.x) \(pointInScene.y) \(pointInScene.y)")
@@ -198,12 +201,10 @@ class GameViewController: UIViewController {
     }
     
     func handleTap(gestureRecognize: UIGestureRecognizer) {
-        // retrieve the SCNView
-        let scnView = self.view as SCNView
         
         // check what nodes are tapped
-        let p = gestureRecognize.locationInView(scnView)
-        let hitResults = scnView.hitTest(p, options: nil)
+        let p = gestureRecognize.locationInView(_scnView)
+        let hitResults = _scnView.hitTest(p, options: nil)
         
         // check that we clicked on at least one object
         if hitResults.count > 0 {
