@@ -16,6 +16,7 @@ class GameViewController: UIViewController {
     
     var scnView : SCNView!
     var _scnScene : EnzoScene!
+    let Z_POINT_OF_VIEW : Float = 46
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,7 +26,7 @@ class GameViewController: UIViewController {
         _scnScene = EnzoScene()
         
         // create a scene view with an empty scene
-        _scnScene.physicsWorld.speed = 4.0
+        _scnScene.physicsWorld.speed = 1.0
         scnView.scene = _scnScene
         scnView.delegate = _scnScene
         _scnScene.physicsWorld.gravity = SCNVector3(x: 0, y: 0, z: 0)
@@ -34,16 +35,16 @@ class GameViewController: UIViewController {
         var camera = SCNCamera()
         var cameraNode = SCNNode()
         var pointToNode = SCNNode()
-        camera.zFar = 46
+        camera.zFar = Double(Z_POINT_OF_VIEW)
         pointToNode.position = SCNVector3Zero
-        cameraNode.constraints = [SCNLookAtConstraint(target: pointToNode)]
+        //cameraNode.constraints = [SCNLookAtConstraint(target: pointToNode)]
         cameraNode.camera = camera
         cameraNode.position = SCNVector3(x: 0, y: 0, z: 46)
         scnView.pointOfView = cameraNode
         _scnScene.rootNode.addChildNode(cameraNode)
         
         // allows the user to manipulate the camera
-        scnView.allowsCameraControl = true
+        scnView.allowsCameraControl = false
 
         createPlane(60, height: 40, z: 0, isVisible: true )
         createBox(-30, y: 0, z: 3, width: 1, height: 42, length: 6)   // Left wall
@@ -52,7 +53,7 @@ class GameViewController: UIViewController {
         createBox(0, y: -20, z: 3, width: 62, height: 1, length: 6)    // Bottom wall
         createPlane(60, height: 40, z: 6, isVisible: false)
         createTorus(0, y: 0, z: 0)
- //       createBalls()
+        createBalls()
         createLight()
 
         // default lighting
@@ -93,6 +94,7 @@ class GameViewController: UIViewController {
             node.physicsBody = SCNPhysicsBody.dynamicBody()
             _scnScene.rootNode.addChildNode(node)
         }
+        createTorus(1,y: 2,z: 0)
     }
     
     func createTorus( x: Float, y: Float, z: Float ) {
@@ -110,9 +112,9 @@ class GameViewController: UIViewController {
         
         // Add physicsfield
         var field = SCNPhysicsField.turbulenceFieldWithSmoothness(0.0, animationSpeed: 0.5)
-        //field = SCNPhysicsField.vortexField()
+        field = SCNPhysicsField.vortexField()
         field.strength = 1.0
-        //torusNode.physicsField = field
+        torusNode.physicsField = field
     }
     
     func createLight() {
@@ -174,12 +176,12 @@ class GameViewController: UIViewController {
     override func touchesBegan(touches: NSSet!, withEvent event: UIEvent!) {
         for touch: AnyObject in touches! {
             let location = touch.locationInView(self.view)
-            let pointView = SCNVector3(x: Float(location.x), y: Float(location.y), z: 1.0)
-            let pointScene = scnView.unprojectPoint(pointView)
+            let pointInView = SCNVector3(x: Float(location.x), y: Float(location.y), z: 0)
+            let pointInScene = scnView.unprojectPoint(pointInView)
 
             println("X Y Z (View) : \(location.x) \(location.y) \(location.y)")
-            println("X Y Z (Scene): \(pointScene.x) \(pointScene.y) \(pointScene.y)")
-            createTorus(Float(pointScene.x * 10), y: Float(pointScene.y * 10), z: 1)
+            println("X Y Z (Scene): \(pointInScene.x) \(pointInScene.y) \(pointInScene.y)")
+            createTorus(Float(pointInScene.x * Z_POINT_OF_VIEW), y: Float(pointInScene.y * Z_POINT_OF_VIEW), z: 0)
         }
     }
     
